@@ -1,0 +1,16 @@
+[build-system]
+requires = ["hatchling"]
+build-backend = "hatchling.build"
+
+[project]
+name = "dfp"
+version = "0.0.1"
+authors = [{name="Jay Morgan", email="jaymiles17@gmail.com"}]
+description = "A suite of functional tools for all your functional programming"
+readme = "README.md"
+requires_python = ">=3.6"
+classifiers = ["Programming Language :: Python :: 3", "License :: OSI Approved :: GNU General Public License v3 (GPLv3)"]
+
+[project.urls]
+"Homepage" = "https://github.com/jaypmorgan/dfp"
+"Bug Tracker" = "https://github.com/jaypmorgan/dfp/issues"
