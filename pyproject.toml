@@ -10,6 +10,7 @@ description = "A suite of functional tools for all your functional programming"
 readme = "README.md"
 requires_python = ">=3.6"
 classifiers = ["Programming Language :: Python :: 3", "License :: OSI Approved :: GNU General Public License v3 (GPLv3)"]
+dependencies = ["tqdm", "pandas"]
 
 [project.urls]
 "Homepage" = "https://github.com/jaypmorgan/dfp"
