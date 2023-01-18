@@ -1,1 +1,3 @@
 /venv/
+/dist/
+/src/dfp.egg-info/
