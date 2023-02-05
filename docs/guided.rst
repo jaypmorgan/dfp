@@ -5,6 +5,6 @@ Guided Tour of DFP
 Debugging
 ---------
 
-.. autofunction:: printr
+.. autofunction:: dfp.printr
 
-.. autofunction:: trace
+.. autofunction:: dfp.trace
