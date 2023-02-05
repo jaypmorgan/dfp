@@ -914,6 +914,15 @@ def printr(x, fun=lambda x: print(x)):
     return x
 
 
+def trace(f):
+    def wrapper(*args, **kwargs):
+        print(f"{f.__name__}: positional {args}, named {kwargs}")
+        out = f(*args, **kwargs)
+        print(f"=> {out}")
+        return out
+    return wrapper
+    
+
 def print_nested_sizes(x, depth=0):
     this_len = len(x)
     print(f"|{'-'*depth}: {this_len}")
