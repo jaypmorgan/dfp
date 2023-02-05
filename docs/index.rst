@@ -11,6 +11,7 @@ Welcome to Dogmatic Functional Programming (DFP)'s documentation!
    :caption: Contents:
 
    self
+   guided
    api
 
 

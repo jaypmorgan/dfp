@@ -1,5 +1,5 @@
-API
-===
+Full API
+========
 
 .. automodule:: dfp
     :members:
