@@ -10,6 +10,9 @@ Welcome to Dogmatic Functional Programming (DFP)'s documentation!
    :maxdepth: 2
    :caption: Contents:
 
+   self
+   api
+
 
 
 Indices and tables
