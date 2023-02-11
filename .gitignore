@@ -2,3 +2,4 @@
 /dist/
 /src/dfp.egg-info/
 build/
+*.pyc
