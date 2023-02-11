@@ -21,7 +21,7 @@ from concurrent.futures import ThreadPoolExecutor, ProcessPoolExecutor
 from collections import namedtuple
 
 import pandas as pd
-from tqdm.asyncio import tqdm
+from tqdm.auto import tqdm
 
 
 Record = tuple[str, Any]
