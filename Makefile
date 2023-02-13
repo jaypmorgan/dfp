@@ -9,3 +9,7 @@ test-upload:
 .PHONY: upload
 upload:
 	python3 -m twine upload --skip-existing dist/*
+
+.PHONY: test
+test:
+	python3 -m unittest tests/test_dfp.py

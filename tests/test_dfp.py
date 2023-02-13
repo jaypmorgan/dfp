@@ -33,6 +33,14 @@ class DFPTests(unittest.TestCase):
         self.assertNotEqual(k, ('a',))
         self.assertEqual(k, ('a', 'b'))
 
+    def test_take_batch(self):
+        lst = list(range(6))
+        out_lst = dfp.take_batch(lst, 0, 4)
+        self.assertEqual(out_lst, [0, 1, 2, 3])
+        self.assertEqual(dfp.take_batch(lst, 1, 4), [4, 5])
+        lst = list()
+        self.assertEqual(dfp.take_batch(lst, 5, 4), [])
+        
 
 if __name__ == '__main__':
     unittest.main()
