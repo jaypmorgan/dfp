@@ -643,6 +643,10 @@ def take_subset(lst: Iterable, indexes: Iterable, bools: bool = False) -> tuple:
                    enumerate(indexes), [])
 
 
+def take_batch(lst, idx: int = 0, batch_size: int = 1):
+    return slice(lst, start=idx*batch_size, stop=(idx*batch_size)+batch_size)
+
+
 def picknmix(*iterables):
     """Take elements from iterables one at a time
 
