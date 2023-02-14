@@ -40,6 +40,15 @@ class DFPTests(unittest.TestCase):
         self.assertEqual(dfp.take_batch(lst, 1, 4), [4, 5])
         lst = list()
         self.assertEqual(dfp.take_batch(lst, 5, 4), [])
+
+    def test_flatten_dict(self):
+        dct = {"my_dict": {"foo": {"bar": {"baz": True}}}}
+        flattened = dfp.flatten_dict(dct)
+        self.assertEqual(flattened["my_dict.foo.bar.baz"], True)
+        flattened = dfp.flatten_dict({})
+        self.assertEqual(flattened, {})
+        flattened = dfp.flatten_dict(dct, key_join_fn=lambda ki, kj: f"{ki}-{kj}")
+        self.assertEqual(flattened["my_dict-foo-bar-baz"], True)
         
 
 if __name__ == '__main__':

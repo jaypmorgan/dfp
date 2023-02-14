@@ -1172,3 +1172,14 @@ def dataframe_to_records(df) -> tuple:
 
 def lz_tmap(fun):
     return lambda iterable: tmap(fun, iterable)
+
+
+def flatten_dict(dct, key_join_fn=lambda ki, kj: f"{ki}.{kj}"):
+    out = {}
+    for k, v in dct.items():
+        if isinstance(v, dict):
+            for ki, vi in flatten_dict(v, key_join_fn).items():
+                out[key_join_fn(k, ki)] = vi
+        else:
+            out[k] = v
+    return out
