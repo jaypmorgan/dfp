@@ -1179,7 +1179,42 @@ def lz_tmap(fun):
 ########################################################################################
 
 
-def flatten_dict(dct, key_join_fn=lambda ki, kj: f"{ki}.{kj}"):
+def flatten_dict(
+    dct: dict, 
+    key_join_fn: Callable[[Any, Any], Any] = lambda ki, kj: f"{ki}.{kj}"
+) -> dict:
+    """Flatten a nested dictionary.
+
+    Flatten a nested dictionary by joining the keys as defined by
+    `key_join_fn`.
+
+        >>> from dfp import flatten_dict
+        >>> nested_dict = {"my-key": {"foo": {"bar": {"baz": "nested-value"}}}}
+        >>> flattened_dict = flatten_dict(nested_dict)
+        >>> flattened_dict
+        {"my-key.foo.bar.baz": "nested-value"}
+
+    By default, `key_join_fn` joins the nested keys by a `.` symbol.
+    Though this behaviour can be user defined by passing a joining
+    function that takes two keys as arguments.
+
+        >>> flattened_dict = flatten_dict(
+                nested_dict,
+                key_join_fn=lambda key1, key2: f"{key1}-{key2}")
+        >>> flattened_dict
+        {"my-key-foo-bar-baz": "nested-value"}
+
+    You could even only use the most nested key:
+
+        >>> flatten_dict(nested_dict, key_join_fn=lambda k1, k2: k2)
+        {"baz": "nested-value"
+
+    :param dct: The nested dictionary to flatten.
+    :type dct: dict
+    :param key_join_fn: The function to join two keys together.
+    :type key_join_fn: Callable
+    :returns: A flattened dictionary with keys joined by `key_join_fn`.
+    """
     out = {}
     for k, v in dct.items():
         if isinstance(v, dict):
@@ -1190,9 +1225,37 @@ def flatten_dict(dct, key_join_fn=lambda ki, kj: f"{ki}.{kj}"):
     return out
 
 
-def merge_dicts(*dicts):
+def merge_dicts(*dicts) -> dict:
+    """Merge many dictionaries into one dictionary.
+
+    Merge many dictionaries into one dictionary, this works better when
+    all dictionaries have the same keys.
+
+    The values of the dictionaries will be accumulated into a list:
+
+        >>> from dfp import merge_dicts
+        >>> dict1, dict2 = {'my-key': 1}, {'my-key': 2}
+        >>> merged_dicts = merge_dicts(dict1, dict2)
+        >>> merged_dicts
+        {'my-key': [1, 2]}
+
+    If the keys don't match between dictionaries then the lengths of the
+    accumulated lists won't match. This may be okay for your use-case,
+    but just know we don't check for this.
+
+        >>> dict1, dict2 = {'my-key-1': 1}, {'my-key-1': 2, 'my-key-2': 1}
+        >>> merged_dicts = merge_dicts(dict1, dict2)
+        >>> merged_dits
+        {'my-key-1': [1, 2], 'my-key-2': [1]}
+
+    :param dicts: The dictionaries to be merged.
+    :returns: A single dictionary with the values from each dictionary
+        being accumulated into a list.
+    """
     out = defaultdict(list)
     for_each(
-        lambda d: for_each(lambda item: out[item[0]].append(item[1]), d.items()),
+        lambda d: for_each(
+            lambda item: out[item[0]].append(item[1]), d.items()), 
         dicts)
     return out
+
