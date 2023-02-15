@@ -18,7 +18,7 @@ from typing import Any, Callable, Optional, Iterator, Union
 from collections.abc import Iterable
 from itertools import product, chain
 from concurrent.futures import ThreadPoolExecutor, ProcessPoolExecutor
-from collections import namedtuple
+from collections import namedtuple, defaultdict
 
 import pandas as pd
 from tqdm.auto import tqdm
@@ -1174,6 +1174,11 @@ def lz_tmap(fun):
     return lambda iterable: tmap(fun, iterable)
 
 
+########################################################################################
+# Transforms
+########################################################################################
+
+
 def flatten_dict(dct, key_join_fn=lambda ki, kj: f"{ki}.{kj}"):
     out = {}
     for k, v in dct.items():
@@ -1182,4 +1187,12 @@ def flatten_dict(dct, key_join_fn=lambda ki, kj: f"{ki}.{kj}"):
                 out[key_join_fn(k, ki)] = vi
         else:
             out[k] = v
+    return out
+
+
+def merge_dicts(*dicts):
+    out = defaultdict(list)
+    for_each(
+        lambda d: for_each(lambda item: out[item[0]].append(item[1]), d.items()),
+        dicts)
     return out

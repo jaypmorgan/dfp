@@ -49,6 +49,14 @@ class DFPTests(unittest.TestCase):
         self.assertEqual(flattened, {})
         flattened = dfp.flatten_dict(dct, key_join_fn=lambda ki, kj: f"{ki}-{kj}")
         self.assertEqual(flattened["my_dict-foo-bar-baz"], True)
+
+    def test_merge_dicts(self):
+        dicts = ({'test': 0}, {'test': 1}, {'test': 2})
+        merged = dfp.merge_dicts(*dicts)
+        self.assertEqual(len(merged['test']), 3)
+        self.assertEqual(merged['test'][-1], 2)
+        self.assertEqual(merged['test'][0], 0)
+        self.assertEqual(dfp.merge_dicts({}), {})
         
 
 if __name__ == '__main__':
