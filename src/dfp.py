@@ -42,6 +42,7 @@ def transducer(f):
         except IndexError:
             return lambda lst: f(*args, lst=lst, **kwargs)
         return f(*args, **kwargs)
+    decorator.__doc__ = f.__doc__
     return decorator
 
 
