@@ -28,10 +28,24 @@ Record = tuple[str, Any]
 Records = Union[dict[str, Any], tuple[Record]]
 
 
+
+def transducer(f):
+    argspec = getfullargspec(f).args
+    iterable_index = argspec.index("lst")
+    def decorator(*args, **kwargs):
+        if "lst" in kwargs.keys() and kwargs["lst"] is None:
+            return lambda lst: f(*args, lst=lst, **kwargs)
+        try:
+            if args[iterable_index] is None:
+                return lambda lst: f(*args, lst=lst, **kwargs)
+        except IndexError:
+            return lambda lst: f(*args, lst=lst, **kwargs)
+    return decorator
+
+
 @dataclass
 class Sequence(Iterable):
-    """
-    Abstraction of an Iterable that supports map, filter, and reduce.
+    """Abstraction of an Iterable that supports map, filter, and reduce.
     The intention of this class is to provide an alternative
     description of applying functional program operations from the
     perspective of an object. For example, we can create an
@@ -242,49 +256,59 @@ def itemize(lst, idx_name: str = "idx", val_name: str = "val"):
     return itemise(lst, idx_name, val_name)
 
 
+@transducer
 def lmap(
     f: Callable,
-    lst: Iterable,
+    lst: Optional[Iterable] = None,
     parallel: bool = False,
     p_workers: int = 4,
+    p_type: str = "thread",
     progress: bool = False,
     progress_fn: Callable = tqdm,
-    p_type: str = "thread",
 ) -> list:
     """Apply function `f` to each element of `lst`. Return the results
-    as a list.
+    as a typle.
 
     :param f: The function to apply to each element.
     :param lst: The iterable of elements to apply the function to.
     :param parallel: Boolean (false by default) flag that specifies if
         the function is applied in parallel using multiple threads. For
         very short functions/iterables this is slower. However, if your
-        function is dependant on io, then you can get very fast speed ups
+        function is dependent on io, then you can get very fast speed-ups
         with this. Results are still in order.
     :param p_workers: The number of workers to run in parallel.
+    :param progress_fn: The function to create a progress bar.
+    :param p_type: The type of multi-processing to use (i.e. thread or
+        process).
     :type f: Callable
     :type lst: Iterable
     :type parallel: boolean
     :type p_workers: int
+    :type progress_fn: Callable
+    :type p_type: str
     :returns: A list with `f` applied to each element of `lst`.
 
-    >>> lmap(lambda x: x*2, range(5))
-    [0, 2, 4, 6, 8]
+        >>> from dfp import lmap
+        >>> lmap(lambda x: x*2, range(5))
+        [0, 2, 4, 6, 8]
+
+    See `tmap` for more examples.
     """
     return list(tmap(f, lst, parallel, p_workers, progress, progress_fn, p_type))
 
 
+@transducer
 def tmap(
         f: Callable,
-        lst: Iterable,
+        lst: Optional[Iterable] = None,
         parallel: bool = False,
         p_workers: int = 4,
+        p_type: str = "thread",
         progress: bool = False,
         progress_fn: Callable = tqdm,
-        p_type: str = "thread",
 ) -> tuple:
     """Apply function `f` to each element of `lst`. Return the results
-    as a list.
+    as a tuple.
 
     :param f: The function to apply to each element.
     :param lst: The iterable of elements to apply the function to.
@@ -305,15 +329,22 @@ def tmap(
     :type p_type: str
     :returns: A tuple with `f` applied to each element of `lst`.
 
-    >>> tmap(lambda x: x*2, range(5))
-    (0, 2, 4, 6, 8)
-    >>> tmap(lambda x: x*2, range(5), parallel=True)
-    (0, 2, 4, 6, 8)
+    Basic Example
+    -------------
+    
+        >>> from dfp import tmap
+        >>> tmap(lambda x: x*2, range(5))
+        (0, 2, 4, 6, 8)
+        >>> tmap(lambda x: x*2, range(5), parallel=True)
+        (0, 2, 4, 6, 8)
+
+    Progress Bars
+    -------------
 
     With `tmap`, the user can enable a progress par by using the argument
-    `argument=True`.
+    `progress=True`.
 
-    >>> tmap(lambda x: x*2, range(5), progress=True)
+        >>> tmap(lambda x: x*2, range(5), progress=True)
 
     This progress bar will also handle asynchronous operations, and
     therefore it is perfectly legal to use both `progress` and
@@ -327,16 +358,43 @@ def tmap(
     function with a single argument -- the data to iterate
     over. Typical usage of this argument is with partial:
 
-    >>> from functools import partial
     >>> from tqdm.auto import tqdm
     >>> tmap(lambda x: x * 2, range(5), progress=True,
-             progress_fn=partial(tqdm, desc="Multiplying numbers by 2"))
+             progress_fn=lambda lst: tqdm(lst, desc="Multiplying numbers by 2"))
 
     When this progress bar appears, it will have the correct
     description.
 
+    Transducers
+    -----------
+
+    When working with pipes and transforming a collection of data, we
+    often apply a transformation and pass the result to the next
+    transformation. For example:
+
+        >>> from dfp import pipe
+        >>> pipe(
+            range(10),
+            lambda lst: tfilter(lambda x: x%2==0, lst),
+            lambda lst: tmap(lambda x: x*2, lst))
+        (0, 4, 8, 12, 16)
+
+    Notice that we have to create an anonymous function that takes the
+    result of the previous transformation. This can become a little
+    annoying, so we allow the `lst` to be optional. If it is not
+    supplied, i.e. None, then `tmap` returns a transducer, a map that
+    takes one argument (the list). This makes composition with
+    transformation pipes much easier.
+
+        >>> pipe(
+            range(10),
+            tfilter(lambda x: x%2==0, lst),
+            tmap(lambda x: x*2, lst))
+
     """
-    pbar = identity if not progress else progress_fn
+    def identity_pbar(x, total=None):
+        return x
+    pbar = identity_pbar if not progress else progress_fn
     if isinstance(lst, (types.GeneratorType, map)):
         lst = list(lst)
     ProcessPool = ThreadPoolExecutor if p_type == "thread" else ProcessPoolExecutor
@@ -347,7 +405,7 @@ def tmap(
             else:
                 result = tuple(executor.map(f, lst))
     else:
-        result = tuple(map(f, pbar(lst)))
+        result = tuple(map(f, pbar(lst, total=len(lst))))
     return result
 
 
@@ -379,7 +437,8 @@ def lzip(*lst):
     return list(zip(*lst))
 
 
-def tfilter(f, lst):
+@transducer
+def tfilter(f: Callable, lst: Optional[Iterable] = None):
     """Eagerly filter a list returning a tuple of elements where
     `f(x)` returns True.
 
@@ -397,7 +456,8 @@ def tfilter(f, lst):
     return tuple(filter(f, lst))
 
 
-def lfilter(f, lst):
+@transducer
+def lfilter(f, lst=None):
     """Eagerly filter a list returning a list of elements where `f(x)`
     is True.
 
@@ -415,7 +475,8 @@ def lfilter(f, lst):
     return list(filter(f, lst))
 
 
-def treduce(f, lst, init):
+@transducer
+def treduce(f, lst=None, init=None):
     """Eagerly apply a reduce operation, returning a tuple if the
     result is not a singleton.
 
@@ -436,13 +497,15 @@ def treduce(f, lst, init):
     >>> treduce(lambda lst, el: lst + [el] if el%2==0 else lst, range(10), [])
     (0, 2, 4, 6, 8)
     """
+    init = [] if init is None else init
     result = reduce(f, lst, init)
     if isinstance(result, Iterable):
         return tuple(result)
     return result
 
 
-def lreduce(f, lst, init):
+@transducer
+def lreduce(f, lst=None, init=None):
     """Eagerly apply a reduce operation, returning a list if the
     result is not a singleton.
 
@@ -463,6 +526,7 @@ def lreduce(f, lst, init):
     >>> lreduce(lambda lst, el: lst + [el] if el%2==0 else lst, range(10), [])
     [0, 2, 4, 6, 8]
     """
+    init = [] if init is None else init
     result = reduce(f, lst, init)
     if isinstance(result, Iterable):
         return list(result)
@@ -1258,4 +1322,3 @@ def merge_dicts(*dicts) -> dict:
             lambda item: out[item[0]].append(item[1]), d.items()), 
         dicts)
     return out
-
