@@ -12,6 +12,7 @@ import os
 import re
 import math
 import types
+from inspect import getfullargspec
 from dataclasses import dataclass
 from functools import reduce
 from typing import Any, Callable, Optional, Iterator, Union
@@ -40,6 +41,7 @@ def transducer(f):
                 return lambda lst: f(*args, lst=lst, **kwargs)
         except IndexError:
             return lambda lst: f(*args, lst=lst, **kwargs)
+        return f(*args, **kwargs)
     return decorator
 
 
@@ -1094,7 +1096,7 @@ def keys(record: Records) -> tuple[str]:
     >>> keys(record)
     ('a',)
     """
-    return orderedset(tmap(lambda row: first(row), record))
+    return orderedset(tmap(first, record))
 
 
 def add(record, key, value):
