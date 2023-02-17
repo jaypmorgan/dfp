@@ -30,6 +30,16 @@ class DFPTests(unittest.TestCase):
         self.assertEqual(len(out), 3)
         self.assertEqual(out[0], 'a')
         self.assertEqual(out[-1], 'c')
+
+    def test_lmap(self):
+        out = dfp.lmap(lambda x: x, range(10))
+        self.assertEqual(len(out), 10)
+        self.assertEqual(out[0], 0)
+        self.assertEqual(out[-1], 9)
+        out = dfp.lmap(lambda x: x*2, range(10))
+        self.assertEqual(len(out), 10)
+        self.assertEqual(out[0], 0)
+        self.assertEqual(out[-1], 18)
             
     def test_keys(self):
         record = (('a', 1), ('a', 2))

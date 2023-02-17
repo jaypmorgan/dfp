@@ -298,7 +298,7 @@ def lmap(
 
     See `tmap` for more examples.
     """
-    return list(tmap(f, lst, parallel, p_workers, progress, progress_fn, p_type))
+    return list(tmap(f, lst, parallel, p_workers, p_type, progress, progress_fn))
 
 
 @transducer
