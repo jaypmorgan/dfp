@@ -221,7 +221,8 @@ class Sequence(Iterable):
         return res
 
 
-def for_each(f, lst):
+@transducer
+def for_each(f: Callable, lst: Optional[Iterable] = None):
     """Apply `f` to each element of `lst`
 
     `for_each` abstracts a simple for loop where a function `f` is

@@ -24,6 +24,13 @@ class DFPTests(unittest.TestCase):
         idx = dfp.find(['a  '], ['a', 'b', ['a'], 'd'])
         self.assertEqual(idx, None)
 
+    def test_for_each(self):
+        out = []
+        dfp.for_each(lambda name: out.append(name), ['a','b','c'])
+        self.assertEqual(len(out), 3)
+        self.assertEqual(out[0], 'a')
+        self.assertEqual(out[-1], 'c')
+            
     def test_keys(self):
         record = (('a', 1), ('a', 2))
         k = dfp.keys(record)
