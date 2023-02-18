@@ -40,6 +40,10 @@ class DFPTests(unittest.TestCase):
         self.assertEqual(len(out), 10)
         self.assertEqual(out[0], 0)
         self.assertEqual(out[-1], 18)
+        out = dfp.lmap(lambda x: x[0], zip(range(10), range(20, 30)))
+        self.assertEqual(out[0], 0)
+        self.assertEqual(out[-1], 9)
+                         
             
     def test_keys(self):
         record = (('a', 1), ('a', 2))
@@ -49,6 +53,14 @@ class DFPTests(unittest.TestCase):
         k = dfp.keys(record)
         self.assertNotEqual(k, ('a',))
         self.assertEqual(k, ('a', 'b'))
+
+    def test_join_string(self):
+        self.assertEqual(dfp.join_strings(["foo", "bar"]), "foobar")
+        self.assertEqual(dfp.join_strings(["foo", "bar"], "/"), "foo/bar")
+
+    def test_join_paths(self):
+        self.assertEqual(dfp.join_paths("/foo", "bar"), "/foo/bar")
+        self.assertEqual(dfp.join_paths("/foo/bar//", "/baz"), "/foo/bar/baz")
 
     def test_take_batch(self):
         lst = list(range(6))

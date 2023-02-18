@@ -409,7 +409,7 @@ def tmap(
             else:
                 result = tuple(executor.map(f, lst))
     else:
-        result = tuple(map(f, pbar(lst, total=len(lst))))
+        result = tuple(map(f, pbar(lst)))
     return result
 
 
@@ -774,13 +774,8 @@ def none_fn(*args, **kwargs):
     return None
 
 
-def join_string(fields, delim=", "):
-    val = first(fields)
-    fields = rest(fields)
-    if len(fields) > 0:
-        res = join_string(fields, delim)
-        return val + delim + res
-    return val
+def join_strings(fields, delim=""):
+    return delim.join(fields)
 
 
 #####################################################################################
@@ -882,7 +877,7 @@ def join_paths(*args) -> str:
     path is always clean, in that it doesn't have duplicate '/' values.
 
     """
-    return re.sub(r"/{2,}", "/", join_string(lmap(str, args), "/"))
+    return re.sub(r"/{2,}", "/", join_strings(lmap(str, args), "/"))
 
 
 def orderedset(x):
