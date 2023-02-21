@@ -1320,4 +1320,4 @@ def merge_dicts(*dicts) -> dict:
         lambda d: for_each(
             lambda item: out[item[0]].append(item[1]), d.items()), 
         dicts)
-    return out
+    return dict(out)
