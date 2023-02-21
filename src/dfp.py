@@ -15,7 +15,7 @@ import types
 from inspect import getfullargspec
 from dataclasses import dataclass
 from functools import reduce
-from typing import Any, Callable, Optional, Iterator, Union
+from typing import Any, Callable, Optional, Iterator, Union, Tuple, List, Dict
 from collections.abc import Iterable
 from itertools import product, chain
 from concurrent.futures import ThreadPoolExecutor, ProcessPoolExecutor
@@ -25,8 +25,8 @@ import pandas as pd
 from tqdm.auto import tqdm
 
 
-Record = tuple[str, Any]
-Records = Union[dict[str, Any], tuple[Record]]
+Record = Tuple[str, Any]
+Records = Union[Dict[str, Any], Tuple[Record]]
 
 
 
@@ -831,7 +831,7 @@ def join_full(left, right, by):
     pass
 
 
-def join(left, right, by: Union[str, list[str]], how: str = "inner"):
+def join(left, right, by: Union[str, List[str]], how: str = "inner"):
     """Join records"""
     fn = {
         "inner": join_inner,
@@ -885,7 +885,7 @@ def orderedset(x):
     return treduce(lambda t, s: t + [s] if s not in t else t, x, [])
 
 
-def alloc(value, length) -> list[Any]:
+def alloc(value, length) -> List[Any]:
     """Create a list with values of specified length
 
     :param value: The value of every value in the new list.
@@ -951,7 +951,7 @@ def member(token, in_list):
         in_list, start_token if start_token is not None else len(in_list))
 
 
-def filesystem_leaves(path: str) -> list[str]:
+def filesystem_leaves(path: str) -> List[str]:
     """Recursively find all files from path"""
     return reduce(lambda t, s: t + [s] if not s[1] else t, os.walk(path), [])
 
@@ -1012,7 +1012,7 @@ def label_records(labels, records):
     return tmap(lambda record: label_record(labels, record), records)
 
 
-def pluck_item(name: Union[str, list[str]], iterable: Records) -> Any:
+def pluck_item(name: Union[str, List[str]], iterable: Records) -> Any:
     """Get value corresponding to the key `name` of a record.
 
     :param name: The name of the `key` to retrieve the value from.
@@ -1059,12 +1059,12 @@ def pluck_item(name: Union[str, list[str]], iterable: Records) -> Any:
         lambda val, item: item[1] if item[0] == name else val, iterable, None)
 
 
-def pluck_items(names: list[str], iterable: Records) -> tuple[Any]:
+def pluck_items(names: List[str], iterable: Records) -> Tuple[Any]:
     """Pluck many items for a single record"""
     return tmap(lambda name: pluck_item(name, iterable), names)
 
 
-def pluck_list(name: str, iterable: Records) -> tuple[Any]:
+def pluck_list(name: str, iterable: Records) -> Tuple[Any]:
     """Pluck an item from many records"""
     return tmap(lambda row: pluck_item(name, row), iterable)
 
@@ -1074,7 +1074,7 @@ def pluck_first(name: str, iterable):
     return first(pluck_list(name, iterable))
 
 
-def keys(record: Records) -> tuple[str]:
+def keys(record: Records) -> Tuple[str]:
     """Return all the keys available in the record
 
     :param record: The record to return keys from.
@@ -1102,7 +1102,7 @@ def add(record, key, value):
     :param record: The record to add a field to.
     :param key: The name of the new field.
     :param value: The value of the new field.
-    :type record: tuple[tuple]
+    :type record: Tuple[tuple]
     :type key: str
     :type value: Any
     :returns: a new record with the field added.
@@ -1138,7 +1138,7 @@ def remove(record, key):
 
     :param record: The record to remove a field from.
     :param key: The name of the field to remove.
-    :type record: tuple[tuple]
+    :type record: Tuple[tuple]
     :type key: str
     :returns: A new record with the field removed.
 
@@ -1216,7 +1216,7 @@ def record_to_dataclass(dc_type, record):
 def records_to_dataframe(records) -> pd.DataFrame:
     """Convert records to dataframe. (WARNING) assumes all records has the same keys"""
     names = orderedset(treduce(lambda t, s: t+list(keys(s)), records, []))
-    data: dict[str, Any]  = {name: [] for name in names}
+    data: Dict[str, Any]  = {name: [] for name in names}
     for_each(
         lambda row: for_each(
             lambda col: data[first(col)].append(second(col)),
