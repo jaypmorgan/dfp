@@ -13,3 +13,8 @@ upload:
 .PHONY: test
 test:
 	python3 -m unittest tests/test_dfp.py
+
+.PHONY: coverage
+coverage:
+	coverage xml docs/coverage.xml
+	coveralls

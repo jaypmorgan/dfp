@@ -3,3 +3,6 @@
 /src/dfp.egg-info/
 build/
 *.pyc
+/.coverage
+/.coveralls.yml
+/htmlcov/
