@@ -230,12 +230,10 @@ def for_each(f: Callable, lst: Optional[Iterable] = None):
     anything but `f` can be used to add the result of `f` to a list
     within the scope of the caller.
 
-    Parameters
-    ----------
-    f : Callable
-        The function to call/apply to each element of `lst`.
-    lst : Iterable
-        The iterable list/tuple/ etc that `f` should be applied to.
+    :param f: The function to call/apply to each element of `lst`.
+    :type f: Callable
+    :param lst: The iterable list/tuple/ etc that `f` should be applied to.
+    :type lst: Iterable
 
     Examples
     --------
@@ -665,20 +663,16 @@ def take_subset(lst: Iterable, indexes: Iterable, bools: bool = False) -> tuple:
     to take. This is equivalent to [lst[idx] for idx in indexes],
     where the result a subset of `lst`.
 
-    Parameters
-    ----------
-    lst : Iterable
-        The iterable to take a subset from.
-    indexes : Iterable
-        An iterable of indexes.
-    bools : bool
-        Optional argument to specify if indexes consists of a list of
+    :param lst: The iterable to take a subset from.
+    :type lst: Iterable
+    :param indexes: An iterable of indexes.
+    :type indexes: Iterable
+    :param bools: Optional argument to specify if indexes consists of a list of
         indexes (bools=False) or if indexes is a list of boolean
         values where True denotes that element x_i should be included
         in the subset.
+    :type bools: bool
 
-    Examples
-    --------
     >>> from src.dfp import take_subset
     >>> lst = ['a', 'b', 'c']
     >>> take_subset(lst, [0, 1])
@@ -846,18 +840,11 @@ def join(left, right, by: Union[str, List[str]], how: str = "inner"):
 def join_paths(*args) -> str:
     """Join paths together.
 
-    Parameters
-    ----------
-    *args : Path, str
-        All the paths you wish to join together.
+    :param *args: All the paths you wish to join together.
+    :type *args: Path, str
 
-    Returns
-    -------
-    str
-        A string representation of the joined path.
+    :returns: A string representation of the joined path.
 
-    Examples
-    --------
     >>> from src.dfp import join_paths
     >>> join_paths("/path/to", "something")
     '/path/to/something'
@@ -981,11 +968,18 @@ def printr(x, fun=lambda x: print(x)):
     return x
 
 
-def trace(f):
+def trace(f, before: Optional[Callable] = None, after: Optional[Callable] = None):
+    """
+    Trace the input and output of a function by wrapping it with `trace`.
+    """
+    if print_before is None:
+        print_before = lambda fn, args, kwargs: print(f"{fn.__name__}: positional {args}, named {kwargs}")
+    if print_after is None:
+        print_after = lambda fn, args, kwargs, out: print(f"=> {out}")
     def wrapper(*args, **kwargs):
-        print(f"{f.__name__}: positional {args}, named {kwargs}")
+        before(f, args, kwargs)
         out = f(*args, **kwargs)
-        print(f"=> {out}")
+        after(f, args, kwargs, out)
         return out
     return wrapper
     
