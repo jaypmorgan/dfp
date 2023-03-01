@@ -16,5 +16,6 @@ test:
 
 .PHONY: coverage
 coverage:
-	coverage xml docs/coverage.xml
+	coverage run --include=src/dfp.py -m unittest tests/test_dfp.py 
+	coverage xml --include=src/dfp.py
 	coveralls

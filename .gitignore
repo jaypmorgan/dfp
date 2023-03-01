@@ -6,3 +6,4 @@ build/
 /.coverage
 /.coveralls.yml
 /htmlcov/
+/coverage.xml
