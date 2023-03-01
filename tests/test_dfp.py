@@ -84,6 +84,34 @@ class DFPTests(unittest.TestCase):
         out = dfp.take(range(10), 5)
         self.assertEqual(dfp.first(out), 0)
         self.assertEqual(dfp.second(out), 1)
+
+    def test_has_props(self):
+        a = (('a', 1), ('b', 2),)
+        self.assertTrue(dfp.has_props(a, {"a": 1}))
+        self.assertFalse(dfp.has_props(a, {"b": 1}))
+        self.assertTrue(dfp.has_props(a, {"a": [1, 2], "b": 2}))
+        self.assertTrue(dfp.has_props(a, {"b": lambda v: v > 0}))
+
+    def test_inverse(self):
+        fn = lambda i: i == 0
+        inv_fn = dfp.inverse(fn)
+        out1 = dfp.lfilter(fn, range(10))
+        out2 = dfp.lfilter(inv_fn, range(10))
+        self.assertEqual(len(out1), 1)
+        self.assertEqual(len(out2), 9)
+
+    def test_pluck_item(self):
+        record = (('a', 1), ('a', 2))
+        self.assertEqual(dfp.pluck_item("a", record), 2)
+        a = (('a', 1), ('b', 2),)
+        self.assertEqual(dfp.pluck_item("b", a), 2)
+        self.assertEqual(dfp.pluck_item("c", a), None)
+
+    def test_pluck_list(self):
+        a = ((('a', 1), ('b', 2),), (('a', 5), ('b', 4),),)
+        out = dfp.pluck_list("a", a)
+        self.assertEqual(out[0], 1)
+        self.assertEqual(out[1], 5)
             
     def test_keys(self):
         record = (('a', 1), ('a', 2))

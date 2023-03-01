@@ -1227,10 +1227,6 @@ def dataframe_to_records(df) -> tuple:
         df.iterrows())
 
 
-def lz_tmap(fun):
-    return lambda iterable: tmap(fun, iterable)
-
-
 ########################################################################################
 # Transforms
 ########################################################################################
