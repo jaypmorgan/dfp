@@ -43,7 +43,47 @@ class DFPTests(unittest.TestCase):
         out = dfp.lmap(lambda x: x[0], zip(range(10), range(20, 30)))
         self.assertEqual(out[0], 0)
         self.assertEqual(out[-1], 9)
-                         
+        out = dfp.lmap(lambda x: x**2, range(10_000), parallel=True)
+        self.assertEqual(out[0], 0)
+        self.assertEqual(len(out), 10_000)
+        self.assertEqual(out[-1], 9999**2)
+        out = dfp.lmap(lambda x: x**2, map(lambda x: x, range(10_000)), parallel=True, progress=True)
+        self.assertEqual(out[0], 0)
+        self.assertEqual(len(out), 10_000)
+        self.assertEqual(out[-1], 9999**2)
+        out = dfp.lmap(lambda x: x**2, map(lambda x: x, range(10_000)), parallel=False, progress=True)
+        self.assertEqual(out[0], 0)
+        self.assertEqual(len(out), 10_000)
+        self.assertEqual(out[-1], 9999**2)
+
+    def test_lzip(self):
+        out = dfp.lzip(dfp.tfilter(lambda i: i % 2 == 0, range(10)), dfp.tfilter(lambda i: i % 2 != 0, range(10)))
+        self.assertEqual(out[0][0], 0)
+        self.assertEqual(out[0][1], 1)
+        self.assertEqual(out[1][0], 2)
+        self.assertEqual(len(out), 5)
+
+    def test_lfilter(self):
+        out = dfp.lfilter(lambda i: i % 2 == 0, range(10))
+        self.assertEqual(len(out), 5)
+        self.assertEqual(out[0], 0)
+        self.assertEqual(out[1], 2)
+        out = dfp.lfilter(lambda i: i, [])
+        self.assertEqual(len(out), 0)
+
+    def test_first_rest(self):
+        f, r = dfp.first_rest(range(10))
+        self.assertEqual(f, 0)
+        self.assertEqual(r[0], 1)
+        self.assertEqual(len(r), 9)
+
+    def test_nth(self):
+        self.assertEqual(dfp.nth(range(10), 9), 9)
+
+    def test_take(self):
+        out = dfp.take(range(10), 5)
+        self.assertEqual(dfp.first(out), 0)
+        self.assertEqual(dfp.second(out), 1)
             
     def test_keys(self):
         record = (('a', 1), ('a', 2))

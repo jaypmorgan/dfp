@@ -436,7 +436,7 @@ def lzip(*lst):
     >>> lzip(['a', 'b'], [1, 2])
     [('a', 1), ('b', 2)]
     """
-    return list(zip(*lst))
+    return tzip(*lst)
 
 
 @transducer
@@ -474,7 +474,7 @@ def lfilter(f, lst=None):
     >>> lfilter(lambda x: x % 2 == 0, range(10))
     [0, 2, 4, 6, 8]
     """
-    return list(filter(f, lst))
+    return tfilter(f, lst)
 
 
 @transducer
