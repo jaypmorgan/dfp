@@ -25,6 +25,11 @@ import pandas as pd
 from tqdm.auto import tqdm
 
 
+__version__ = '0.7.0'
+__author__ = "Jay Paul Morgan"
+__email__ = "jay@morganwastaken.com"
+
+
 Record = Tuple[str, Any]
 Records = Union[Dict[str, Any], Tuple[Record]]
 
@@ -407,7 +412,7 @@ def tmap(
             else:
                 result = tuple(executor.map(f, lst))
     else:
-        result = tuple(map(f, pbar(lst)))
+        result = tuple(map(f, lst))
     return result
 
 
@@ -600,6 +605,7 @@ def first_rest(lst) -> tuple:
     return first(lst), rest(lst)
 
 
+@transducer
 def nth(lst, n):
     """Return the `n`-th element (using 0-based indexing) of an
     iterable.
@@ -955,6 +961,19 @@ def compose(*funs):
 def pipe(*args):
     """Pipe data through functions"""
     return reduce(lambda r, f: f(r), rest(args), first(args))
+
+
+class Pipe:
+    def __init__(self, a):
+        self.a=a
+    def __gt__(self, f):
+        return Pipe(f(self.a))
+    def __or__(self, f):
+        return Pipe(f(self.a))
+    def __repr__(self):
+        return self.a.__repr__()
+    def __str__(self):
+        return self.__repr__()
 
 
 def thread(*args):
