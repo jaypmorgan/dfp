@@ -12,6 +12,7 @@ import os
 import re
 import math
 import types
+from pathlib import Path
 from inspect import getfullargspec
 from dataclasses import dataclass
 from functools import reduce
@@ -25,13 +26,14 @@ import pandas as pd
 from tqdm.auto import tqdm
 
 
-__version__ = '0.7.0'
+__version__ = '0.8.1'
 __author__ = "Jay Paul Morgan"
 __email__ = "jay@morganwastaken.com"
 
 
 Record = Tuple[str, Any]
 Records = Union[Dict[str, Any], Tuple[Record]]
+Filepath = Union[str, Path]
 
 
 
@@ -49,6 +51,39 @@ def transducer(f):
         return f(*args, **kwargs)
     decorator.__doc__ = f.__doc__
     return decorator
+
+
+def port(filename: Filepath, fn: Callable, read_mode: str =  "r") -> str:
+    with open(filename, read_mode) as open_file:
+        if read_mode == "r":
+            out = fn(open_file)
+        else:
+            fn(open_file)
+            out = str(filename)
+    return out
+
+
+def port_lines(filename: Filepath, content: Optional[list[str]] = None) -> Union[str, list[str]]:
+    fn, rm = lambda filestream: filestream.read().split("\n"), "r"
+    if content is not None:
+        fn, rm = lambda filestream: filestream.write(join_strings(content, "\n")), "w"
+    return port(filename, fn, rm)
+
+
+def port_csv(filename: Filepath, content: Optional[list[str]] = None) -> Union[str, list[str]]:
+    import csv
+    def reader(open_file):
+        dialect = csv.Sniffer().sniff(open_file.read(1024))
+        open_file.seek(0)
+        r = csv.reader(open_file, dialect)
+        return [line for line in r]
+    def writer(open_file):
+        w = csv.writer(open_file)
+        w.writerows(content)
+    fn, rm = reader, "r"
+    if content is not None:
+        fn, rm = writer, "w"
+    return port(filename, fn, rm)
 
 
 @dataclass
@@ -479,7 +514,7 @@ def lfilter(f, lst=None):
     >>> lfilter(lambda x: x % 2 == 0, range(10))
     [0, 2, 4, 6, 8]
     """
-    return tfilter(f, lst)
+    return list(tfilter(f, lst))
 
 
 @transducer

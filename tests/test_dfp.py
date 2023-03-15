@@ -70,6 +70,7 @@ class DFPTests(unittest.TestCase):
         self.assertEqual(out[1], 2)
         out = dfp.lfilter(lambda i: i, [])
         self.assertEqual(len(out), 0)
+        self.assertEqual(type(out), list)
 
     def test_first_rest(self):
         f, r = dfp.first_rest(range(10))
@@ -156,6 +157,22 @@ class DFPTests(unittest.TestCase):
         self.assertEqual(merged['test'][-1], 2)
         self.assertEqual(merged['test'][0], 0)
         self.assertEqual(dfp.merge_dicts({}), {})
+
+    def test_port_lines(self):
+        content = ["this is a test", "this is another line"]
+        filepath = dfp.port_lines("/tmp/filename.txt", content)
+        self.assertEqual(filepath, "/tmp/filename.txt")
+        out_content = dfp.port_lines(filepath)
+        self.assertEqual(out_content[0], "this is a test")
+        self.assertEqual(out_content[1], "this is another line")
+
+    def test_port_csv(self):
+        content = [["this is a test", "this is another line"]]
+        filepath = dfp.port_csv("/tmp/filename.csv", content)
+        self.assertEqual(filepath, "/tmp/filename.csv")
+        out_content = dfp.port_csv(filepath)
+        self.assertEqual(out_content[0][0], "this is a test")
+        self.assertEqual(out_content[0][1], "this is another line")
         
 
 if __name__ == '__main__':
