@@ -26,7 +26,7 @@ import pandas as pd
 from tqdm.auto import tqdm
 
 
-__version__ = '0.8.1'
+__version__ = '0.8.2'
 __author__ = "Jay Paul Morgan"
 __email__ = "jay@morganwastaken.com"
 
@@ -447,7 +447,7 @@ def tmap(
             else:
                 result = tuple(executor.map(f, lst))
     else:
-        result = tuple(map(f, lst))
+        result = tuple(pbar(map(f, lst)))
     return result
 
 
