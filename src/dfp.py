@@ -26,7 +26,7 @@ import pandas as pd
 from tqdm.auto import tqdm
 
 
-__version__ = '0.8.3'
+__version__ = '0.8.4'
 __author__ = "Jay Paul Morgan"
 __email__ = "jay@morganwastaken.com"
 
@@ -73,7 +73,7 @@ def port_lines(filename: Filepath, content: Optional[list[str]] = None) -> Union
 def port_csv(filename: Filepath, content: Optional[list[str]] = None) -> Union[str, list[str]]:
     import csv
     def reader(open_file):
-        dialect = csv.Sniffer().sniff(open_file.read(1024))
+        dialect = csv.Sniffer().sniff(open_file.readline())
         open_file.seek(0)
         r = csv.reader(open_file, dialect)
         return [line for line in r]
