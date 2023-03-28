@@ -173,6 +173,23 @@ class DFPTests(unittest.TestCase):
         out_content = dfp.port_csv(filepath)
         self.assertEqual(out_content[0][0], "this is a test")
         self.assertEqual(out_content[0][1], "this is another line")
+
+    def test_port_pickle(self):
+        content = [["this is a test", "this is another line"]]
+        filepath = dfp.port_pickle("/tmp/filename.pkl", content)
+        self.assertEqual(filepath, "/tmp/filename.pkl")
+        out_content = dfp.port_pickle(filepath)
+        self.assertEqual(out_content[0][0], "this is a test")
+        self.assertEqual(out_content[0][1], "this is another line")
+
+    def test_port_json(self):
+        content = [["this is a test", "this is another line"]]
+        filepath = dfp.port_json("/tmp/filename.json", content)
+        self.assertEqual(filepath, "/tmp/filename.json")
+        out_content = dfp.port_json(filepath)
+        self.assertEqual(out_content[0][0], "this is a test")
+        self.assertEqual(out_content[0][1], "this is another line")
+        
         
 
 if __name__ == '__main__':

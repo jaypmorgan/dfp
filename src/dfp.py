@@ -26,7 +26,7 @@ import pandas as pd
 from tqdm.auto import tqdm
 
 
-__version__ = '0.8.4'
+__version__ = '0.9.0'
 __author__ = "Jay Paul Morgan"
 __email__ = "jay@morganwastaken.com"
 
@@ -54,8 +54,11 @@ def transducer(f):
 
 
 def port(filename: Filepath, fn: Callable, read_mode: str =  "r") -> str:
+    """
+    Read and write to a stream
+    """
     with open(filename, read_mode) as open_file:
-        if read_mode == "r":
+        if read_mode in ["r", "rb"]:
             out = fn(open_file)
         else:
             fn(open_file)
@@ -64,6 +67,9 @@ def port(filename: Filepath, fn: Callable, read_mode: str =  "r") -> str:
 
 
 def port_lines(filename: Filepath, content: Optional[list[str]] = None) -> Union[str, list[str]]:
+    """
+    Read and write lines to a stream
+    """
     fn, rm = lambda filestream: filestream.read().split("\n"), "r"
     if content is not None:
         fn, rm = lambda filestream: filestream.write(join_strings(content, "\n")), "w"
@@ -71,6 +77,9 @@ def port_lines(filename: Filepath, content: Optional[list[str]] = None) -> Union
 
 
 def port_csv(filename: Filepath, content: Optional[list[str]] = None) -> Union[str, list[str]]:
+    """
+    Read and write to a CSV format into a stream.
+    """
     import csv
     def reader(open_file):
         dialect = csv.Sniffer().sniff(open_file.readline())
@@ -83,6 +92,28 @@ def port_csv(filename: Filepath, content: Optional[list[str]] = None) -> Union[s
     fn, rm = reader, "r"
     if content is not None:
         fn, rm = writer, "w"
+    return port(filename, fn, rm)
+
+
+def port_pickle(filename: Filepath, content: Optional[Any] = None) -> Union[str, Any]:
+    """
+    Read and write a pickle format.
+    """
+    import pickle
+    fn, rm = lambda filestream: pickle.loads(filestream.read()), "rb"
+    if content is not None:
+        fn, rm = lambda filestream: pickle.dump(content, filestream), "wb"
+    return port(filename, fn, rm)
+
+
+def port_json(filename: Filepath, content: Optional[dict] = None) -> Union[str, dict]:
+    """
+    Read and write to a json format.
+    """
+    import json
+    fn, rm = lambda filestream: json.loads(filestream.read()), "r"
+    if content is not None:
+        fn, rm = lambda filestream: filestream.write(json.dumps(content)), "w"
     return port(filename, fn, rm)
 
 
