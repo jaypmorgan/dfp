@@ -4,6 +4,7 @@
 [![Coverage Status](https://coveralls.io/repos/github/jaypmorgan/dfp/badge.svg?branch=main)](https://coveralls.io/github/jaypmorgan/dfp?branch=main)
 ![PyPI](https://img.shields.io/pypi/v/dfp?label=dfp)
 ![PyPI - Downloads](https://img.shields.io/pypi/dm/dfp)
+![Tests passing](https://github.com/jaypmorgan/dfp/actions/workflows/python-test.yml/badge.svg)
 
 Procedures to help with help with functional-styles in the Python programming language.
 
