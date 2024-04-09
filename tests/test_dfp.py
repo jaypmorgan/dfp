@@ -1,5 +1,7 @@
 import unittest
 
+import pandas as pd
+
 from src import dfp
 
 
@@ -55,6 +57,11 @@ class DFPTests(unittest.TestCase):
         self.assertEqual(out[0], 0)
         self.assertEqual(len(out), 10_000)
         self.assertEqual(out[-1], 9999**2)
+
+        # check that lmap works as intended on Pandas Series
+        df = pd.DataFrame({'a': range(10), 'b': range(10)})
+        out = dfp.lmap(lambda x: x**2, df['b'])
+        self.assertEqual(out, [x**2 for x in range(10)])
 
     def test_lzip(self):
         out = dfp.lzip(dfp.tfilter(lambda i: i % 2 == 0, range(10)), dfp.tfilter(lambda i: i % 2 != 0, range(10)))
@@ -189,8 +196,7 @@ class DFPTests(unittest.TestCase):
         out_content = dfp.port_json(filepath)
         self.assertEqual(out_content[0][0], "this is a test")
         self.assertEqual(out_content[0][1], "this is another line")
-        
-        
+
 
 if __name__ == '__main__':
     unittest.main()

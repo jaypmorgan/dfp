@@ -367,6 +367,9 @@ def lmap(
 
     See `tmap` for more examples.
     """
+    if isinstance(lst, pd.Series):
+        # pandas series should be iterable over rows
+        lst = lst.tolist()
     return list(tmap(f, lst, parallel, p_workers, p_type, progress, progress_fn))
 
 
